@@ -1,0 +1,16 @@
+# {{ ansible_managed }}
+
+{{ consul_log_dir }}/*.log {
+  missingok
+  notifempty
+  compress
+  dateext
+  copytruncate
+  create 644 consul consul
+  sharedscripts
+  su consul consul
+  postrotate
+    pid=/var/run/consul.pid
+    test -s $pid && kill -USR1 "$(cat $pid)"
+  endscript
+}

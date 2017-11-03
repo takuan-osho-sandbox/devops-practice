@@ -1,0 +1,21 @@
+{
+  "datacenter": "{{ consul_datacenter }}",
+  "node_name": "{{ consul_node_name }}",
+{% if consul_server %}
+  "bootstrap_expect": {{ consul_bootstrap_expect }},
+{% endif %}
+  "server": {{ "true" if consul_server else "false" }},
+  "bind_addr": "{{ consul_bind_addr }}",
+  "client_addr": "{{ consul_client_addr }}",
+{% if consul_advertise_addr %}
+  "advertise_addr": "{{ consul_advertise_addr }}",
+{% endif %}
+  "data_dir": "{{ consul_data_dir }}",
+  "ui": {{ "true" if consul_ui else "false" }},
+  "rejoin_after_leave": {{ "true" if consul_rejoin_after_leave else "false" }},
+  "log_level": "{{ consul_log_level }}",
+  "enable_syslog": {{ "true" if consul_enable_syslog else "false" }},
+  "encrypt": "{{ consul_encrypt }}",
+  "disable_remote_exec": {{ "true" if consul_disable_remote_exec else "false" }},
+  "enable_script_checks": {{ "true" if consul_enable_script_checks else "false" }}
+}

@@ -1,0 +1,124 @@
+---
+
+# User
+- name: consul user
+  user:
+    name: "{{ consul_user }}"
+  tags:
+    - consul
+    - consul.user
+
+- name: consul group
+  group:
+    name: "{{ consul_group }}"
+  tags:
+    - consul
+    - consul.group
+
+# Download
+- name: download binary
+  get_url:
+    url: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_linux_amd64.zip"
+    dest: "{{ consul_tmp_dir }}"
+    mode: 0644
+    checksum: "sha256:{{ consul_sha256sum[consul_version] }}"
+  tags:
+    - consul
+    - consul.download
+
+- name: unarchive
+  unarchive:
+    src: "{{ consul_tmp_dir }}/consul_{{ consul_version }}_linux_amd64.zip"
+    dest: "{{ consul_install_dir }}"
+    copy: no
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags:
+    - consul
+    - consul.unarchive
+
+- name: make it executable
+  file:
+    path: "{{ consul_install_dir }}/consul"
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    mode: 0755
+    state: file
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags:
+    - consul
+    - consul.chmod
+
+- name: make directories for consul
+  file:
+    path: "{{ item }}"
+    owner: "{{ consul_user}}"
+    group: "{{ consul_group }}"
+    mode: 0755
+    state: directory
+  with_items:
+    - "{{ consul_config_dir }}"
+    - "{{ consul_data_dir }}"
+    - "{{ consul_log_dir }}"
+  tags:
+    - consul
+    - consul.dirs
+
+- name: logrotate
+  template:
+    src: ./logrotate.j2
+    dest: /etc/logrotate.d/consul
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - consul
+    - consul.logrotate
+
+- name: consul sysconfig file
+  template:
+    src: ./sysconfig.j2
+    dest: "{{consul_sysconfig_dir}}/consul"
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    mode: 0644
+  tags:
+    - consul
+    - consul.conf
+
+- name: consul service file
+  template:
+    src: ./consul.service.j2
+    dest: /etc/systemd/system/consul.service
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    mode: 0644
+  notify:
+    - systemctl daemon-reload
+  tags:
+    - consul
+    - consul.conf
+    - consul.conf.service
+
+- name: consul config file
+  template:
+    src: ./consul.json.j2
+    dest: "{{ consul_config_dir }}/consul.json"
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    mode: 0644
+  notify:
+    - reload consul
+  tags:
+    - consul
+    - consul.conf
+    - consul.conf.json
+
+- name: service
+  service:
+    name: consul
+    state: started
+    enabled: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags:
+    - consul
+    - consul.service

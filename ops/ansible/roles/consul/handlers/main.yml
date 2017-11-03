@@ -1,0 +1,9 @@
+---
+- name: systemctl daemon-reload
+  shell: systemctl daemon-reload
+
+- name: reload consul
+  service:
+    name: consul
+    state: reloaded
+  ignore_errors: "{{ ansible_check_mode }}"

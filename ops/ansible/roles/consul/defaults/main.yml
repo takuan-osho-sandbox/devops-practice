@@ -1,0 +1,32 @@
+---
+consul_version: 1.0.0
+consul_sha256sum:
+  "1.0.0": 585782e1fb25a2096e1776e2da206866b1d9e1f10b71317e682e03125f22f479
+consul_user: consul
+consul_group: consul
+consul_tmp_dir: /tmp
+consul_install_dir: /usr/local/sbin
+consul_config_dir: /etc/consul.d
+consul_data_dir: /var/lib/consul
+consul_log_dir: /var/log/consul
+
+# sysconfig
+consul_sysconfig_dir: /etc/default
+consul_gomaxprocs: 2
+consul_options: "-server"
+
+# consul config
+consul_datacenter: dc1
+consul_node_name: "{{ ansible_hostname }}"
+consul_bootstrap_expect: 3
+consul_server: false
+consul_bind_addr: "0.0.0.0"
+consul_client_addr: "0.0.0.0"
+consul_advertise_addr: "{{ ansible_default_ipv4.address }}"
+consul_ui: true
+consul_rejoin_after_leave: true
+consul_log_level: INFO
+consul_enable_syslog: true
+consul_encrypt: ""
+consul_disable_remote_exec: false
+consul_enable_script_checks: true
