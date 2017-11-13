@@ -1,0 +1,17 @@
+[Unit]
+Description=vault agent
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+User={{ vault_user }}
+Group={{ vault_group }}
+EnvironmentFile=-{{ vault_sysconfig_dir }}/vault
+Environment=GOMAXPROCS={{ vault_gomaxprocs }}
+Restart=on-failure
+ExecStart={{ vault_install_dir }}/vault server $OPTIONS -config={{ vault_config_dir }}
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

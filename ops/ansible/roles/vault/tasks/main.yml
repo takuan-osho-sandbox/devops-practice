@@ -1,0 +1,130 @@
+---
+
+# User
+- name: vault user
+  user:
+    name: "{{ vault_user }}"
+  tags:
+    - vault
+    - vault.user
+
+- name: vault group
+  group:
+    name: "{{ vault_group }}"
+
+# Download
+- name: download binary
+  get_url:
+    url: "https://releases.hashicorp.com/vault/{{ vault_version }}/vault_{{ vault_version }}_linux_amd64.zip"
+    dest: "{{ vault_tmp_dir }}"
+    mode: 0644
+    checksum: "sha256:{{ vault_sha256sum[vault_version] }}"
+  tags:
+    - vault
+    - vault.download
+
+- name: unarchive
+  unarchive:
+    src: "{{ vault_tmp_dir }}/vault_{{ vault_version }}_linux_amd64.zip"
+    dest: "{{ vault_install_dir }}"
+    copy: no
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags:
+    - vault
+    - vault.unarchive
+
+- name: make it executable
+  file:
+    path: "{{ vault_install_dir }}/vault"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: 0755
+    state: file
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags:
+    - vault
+    - vault.chmod
+
+- name: Enable mlock
+  capabilities:
+    path: "{{ vault_install_dir }}/vault"
+    capability: cap_ipc_lock=+ep
+    state: present
+  when: vault_mlock == True
+  tags:
+    - vault
+    - vault.mlock
+
+- name: make directories for vault
+  file:
+    path: "{{ item }}"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: 0755
+    state: directory
+  with_items:
+    - "{{ vault_config_dir }}"
+    - "{{ vault_log_dir }}"
+  tags:
+    - vault
+    - vault.dirs
+
+- name: logrotate
+  template:
+    src: ./logrotate.j2
+    dest: /etc/logrotate.d/vault
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - vault
+    - vault.logrotate
+
+- name: vault sysconfig file
+  template:
+    src: ./sysconfig.j2
+    dest: "{{ vault_sysconfig_dir }}"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: 0644
+  tags:
+    - vault
+    - vault.conf
+
+- name: vault service file
+  template:
+    src: ./vault.service.j2
+    dest: /etc/systemd/system/vault.service
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: 0644
+  notify:
+    - systemctl daemon-reload
+  tags:
+    - vault
+    - vault.conf
+    - vault.conf.service
+
+- name: vault config file
+  template:
+    src: ./vault.hcl.j2
+    dest: "{{ vault_config_dir }}/vault.hcl"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: 0644
+  notify:
+    - restart vault
+  tags:
+    - vault
+    - vault.conf
+    - vault.conf.server
+
+- name: service
+  service:
+    name: vault
+    state: started
+    enabled: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags:
+    - vault
+    - vault.service

@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+
+storage "consul" {
+  address = "{{ vault_storage_consul_address }}"
+  path    = "vault/"
+}
+
+listener "tcp" {
+  address     = "{{ vault_listener_address }}"
+  tls_disable = {{ 1 if vault_tls_disable else "false" }}
+}
+
+default_lease_ttl = "{{ vault_default_lease_ttl }}"
+max_lease_ttl     = "{{ vault_max_lease_ttl }}"

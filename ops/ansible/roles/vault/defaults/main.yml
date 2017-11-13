@@ -1,0 +1,23 @@
+---
+vault_version: 0.7.3
+vault_sha256sum:
+  0.7.3: 2822164d5dd347debae8b3370f73f9564a037fc18e9adcabca5907201e5aab45
+vault_user: vault
+vault_group: vault
+vault_tmp_dir: /tmp
+vault_install_dir: /usr/local/sbin
+vault_config_dir: /etc/vault.d
+vault_log_dir: /var/log/vault
+
+# sysconfig
+vault_sysconfig_dir: /etc/default
+vault_gomaxprocs: "{{ ansible_processor_vcpus }}"
+vault_options: ""
+
+# vault config
+vault_storage_consul_address: "127.0.0.1:8500"
+vault_listener_address: "127.0.0.1:8200"
+vault_tls_disable: true
+vault_default_lease_ttl: "768h"
+vault_max_lease_ttl: "768h"
+vault_mlock: true

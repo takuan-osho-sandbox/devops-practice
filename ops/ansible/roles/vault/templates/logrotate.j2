@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+
+{{ vault_log_dir }}/*.log {
+  missingok
+  notifempty
+  compress
+  dateext
+  copytruncate
+  create 644 vault vault
+  sharedscripts
+  postrotate
+    pid=/var/run/vault.pid
+    test -s $pid && kill -USR1 "$(cat $pid)"
+  endscript
+}
