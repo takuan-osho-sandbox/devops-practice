@@ -1,0 +1,36 @@
+---
+
+# User
+- name: prometheus user
+  user:
+    name: "{{ prometheus_user }}"
+  tags:
+    - prometheus
+    - prometheus.user
+
+- name: prometheus group
+  group:
+    name: "{{ prometheus_group }}"
+  tags:
+    - prometheus
+    - prometheus.group
+
+# Download
+- name: download binary
+  get_url:
+    url: ""
+    dest: "{{ prometeus_tmp_dir }}"
+    mode: 0644
+  tags:
+    - prometheus
+    - prometheus.download
+
+- name: unarchive
+  unarchive:
+    src:
+    dest: "{{ prometheus_install_dir }}"
+    copy: no
+  ignore_errors: "{{  ansible_check_mode}}"
+  tags:
+    - prometheus
+    - prometheus.unarchive
