@@ -11,6 +11,9 @@
 - name: vault group
   group:
     name: "{{ vault_group }}"
+  tags:
+    - vault
+    - vault.group
 
 # Download
 - name: download binary
