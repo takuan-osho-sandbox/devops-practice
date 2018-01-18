@@ -1,0 +1,124 @@
+---
+
+# User
+- name: nomad user
+  user:
+    name: "{{ nomad_user }}"
+  tags:
+    - nomad
+    - nomad.user
+
+- name: nomad group
+  group:
+    name: "{{ nomad_group }}"
+  tags:
+    - nomad
+    - nomad.group
+
+# Download
+- name: download binary
+  get_url:
+    url: "https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_linux_amd64.zip"
+    dest: "{{ nomad_tmp_dir }}"
+    mode: 0644
+    checksum: "sha256:{{ nomad_sha256sum[nomad_version] }}"
+  tags:
+    - nomad
+    - nomad.download
+
+- name: unarchive
+  unarchive:
+    src: "{{ nomad_tmp_dir }}/nomad_{{ nomad_version }}_linux_amd64.zip"
+    dest: "{{ nomad_install_dir }}"
+    copy: no
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags:
+    - nomad
+    - nomad.unarchive
+
+- name: make it executable
+  file:
+    path: "{{ nomad_install_dir }}/nomad"
+    owner: "{{ nomad_user }}"
+    group: "{{ nomad_group }}"
+    mode: 0755
+    state: file
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags:
+    - nomad
+    - nomad.chmod
+
+- name: make directories for nomad
+  file:
+    path: "{{ item }}"
+    owner: "{{ nomad_user}}"
+    group: "{{ nomad_group }}"
+    mode: 0755
+    state: directory
+  with_items:
+    - "{{ nomad_config_dir }}"
+    - "{{ nomad_data_dir }}"
+    - "{{ nomad_log_dir }}"
+  tags:
+    - nomad
+    - nomad.dirs
+
+- name: logrotate
+  template:
+    src: ./logrotate.j2
+    dest: /etc/logrotate.d/nomad
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - nomad
+    - nomad.logrotate
+
+- name: nomad sysconfig file
+  template:
+    src: ./sysconfig.j2
+    dest: "{{nomad_sysconfig_dir}}/nomad"
+    owner: "{{ nomad_user }}"
+    group: "{{ nomad_group }}"
+    mode: 0644
+  tags:
+    - nomad
+    - nomad.conf
+
+- name: nomad service file
+  template:
+    src: ./nomad.service.j2
+    dest: /etc/systemd/system/nomad.service
+    owner: "{{ nomad_user }}"
+    group: "{{ nomad_group }}"
+    mode: 0644
+  notify:
+    - systemctl daemon-reload
+  tags:
+    - nomad
+    - nomad.conf
+    - nomad.conf.service
+
+- name: nomad config file
+  template:
+    src: ./nomad.hcl.j2
+    dest: "{{ nomad_config_dir }}/{{ nomad_config_file }}"
+    owner: "{{ nomad_user }}"
+    group: "{{ nomad_group }}"
+    mode: 0644
+  notify:
+    - reload nomad
+  tags:
+    - nomad
+    - nomad.conf
+    - nomad.conf.json
+
+- name: service
+  service:
+    name: nomad
+    state: started
+    enabled: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags:
+    - nomad
+    - nomad.service
