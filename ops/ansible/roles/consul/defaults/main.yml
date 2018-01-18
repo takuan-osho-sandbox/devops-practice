@@ -1,6 +1,7 @@
 ---
-consul_version: 1.0.0
+consul_version: 1.0.2
 consul_sha256sum:
+  "1.0.2": 418329f0f4fc3f18ef08674537b576e57df3f3026f258794b4b4b611beae6c9b
   "1.0.0": 585782e1fb25a2096e1776e2da206866b1d9e1f10b71317e682e03125f22f479
 consul_user: consul
 consul_group: consul
