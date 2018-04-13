@@ -1,0 +1,17 @@
+[Unit]
+Description=nomad agent
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+User={{ nomad_user }}
+Group={{ nomad_group }}
+EnvironmentFile=-{{ nomad_sysconfig_dir }}/nomad
+Environment=GOMAXPROCS={{ nomad_gomaxprocs }}
+Restart=on-failure
+ExecStart={{ nomad_install_dir }}/nomad agent $OPTIONS -config={{ nomad_config_dir }}/{{ nomad_config_file }}
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target
