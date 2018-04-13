@@ -1,6 +1,7 @@
 ---
-vault_version: 0.9.1
+vault_version: 0.10.0
 vault_sha256sum:
+  0.10.0: a6b4b6db132f3bbe6fbb77f76228ffa45bd55a5a1ab83ff043c2c665c3f5a744
   0.9.1: 6308013ee0d6278e98cdfe8d6de0162102a8d25f3bcd1e3737bf7b022a9f6702
   0.7.3: 2822164d5dd347debae8b3370f73f9564a037fc18e9adcabca5907201e5aab45
 vault_user: vault
