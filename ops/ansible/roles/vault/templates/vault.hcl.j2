@@ -5,6 +5,8 @@ storage "consul" {
   path    = "vault/"
 }
 
+ui = {{ vault_ui }}
+
 listener "tcp" {
   address     = "{{ vault_listener_address }}"
   tls_disable = {{ 1 if vault_tls_disable else "false" }}
