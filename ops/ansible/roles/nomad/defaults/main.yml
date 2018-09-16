@@ -4,8 +4,8 @@ nomad_sha256sum:
   "0.8.5": e56c0e95e7a724b4fadd8eba32da5a3f2846f67e22e2352b19d1ada2066e063b
   "0.8.0": 1166cc6cb8b8ef4af73c7ed745b938fd060c6a6222111c13ff5d88efbccd66c5
   "0.7.1": 72b32799c2128ed9d2bb6cbf00c7600644a8d06c521a320e42d5493a5d8a789a
-nomad_user: nomad
-nomad_group: nomad
+nomad_user: root
+nomad_group: root
 nomad_tmp_dir: /tmp
 nomad_install_dir: /usr/local/sbin
 nomad_config_dir: /etc/nomad.d
